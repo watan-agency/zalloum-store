@@ -1,11 +1,9 @@
 'use strict';
 
 const express = require('express');
-const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 const crypto = require('crypto');
 const fs = require('fs');
-
 const app = express();
 const PORT = Number(process.env.PORT) || 5000;
 const DB_PATH = path.join(__dirname, 'store.db');
@@ -27,19 +25,22 @@ if (!WHATSAPP_ACCESS_TOKEN || !WHATSAPP_PHONE_NUMBER_ID || !WHATSAPP_RECIPIENT_N
   console.warn('WhatsApp Cloud API is not configured; orders will be saved but no message will be sent.');
 }
 
-const db = new sqlite3.Database(DB_PATH);
+const db = new Database('store.db');
+
+// إنشاء الجدول مباشرة
 db.serialize(() => {
-  db.run(`CREATE TABLE IF NOT EXISTS products (
-    id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT NOT NULL, category TEXT NOT NULL DEFAULT '',
-    price REAL NOT NULL CHECK (price >= 0), image TEXT NOT NULL, description TEXT NOT NULL DEFAULT '',
-    size TEXT NOT NULL DEFAULT '', color TEXT NOT NULL DEFAULT '',
-    parent_id INTEGER,
-    stock INTEGER NOT NULL DEFAULT 0 CHECK (stock >= 0)
-  )`);
-  db.run(`CREATE TABLE IF NOT EXISTS store_settings (
-    key TEXT PRIMARY KEY,
-    value TEXT NOT NULL
-  )`);
+  db.prepare(`
+    CREATE TABLE IF NOT EXISTS products (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      name TEXT,
+      price REAL,
+      image TEXT,
+      category TEXT,
+      sizes TEXT,
+      colors TEXT,
+      stock INTEGER
+    )
+  `).run();
   db.run('ALTER TABLE products ADD COLUMN stock INTEGER NOT NULL DEFAULT 0', () => {});
   db.run("ALTER TABLE products ADD COLUMN size TEXT NOT NULL DEFAULT ''", () => {});
   db.run("ALTER TABLE products ADD COLUMN color TEXT NOT NULL DEFAULT ''", () => {});
