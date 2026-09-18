@@ -757,7 +757,7 @@
 
         function storeApp() {
             return {
-                apiUrl: '/api', searchQuery: '', showDashboard: false, adminLoginOpen: false,
+                apiUrl: 'https://zalloum-store.onrender.com', searchQuery: '', showDashboard: false, adminLoginOpen: false,
                 language: localStorage.getItem('zalloum_language') === 'he' ? 'he' : 'ar',
                 translations: {
                     ar: { search: 'ابحث في المتجر', season: 'تشكيلة صيف 2026 الجديدة', heroTitle: 'خطوتك التالية نحو', styleComfort: 'الأناقة والراحة', heroDescription: 'اكتشف تصاميم الأحذية العصرية المصممة خصيصاً لتمنحك الأداء الرياضي الفائق والمظهر الاستثنائي في كل وقت.', shopNow: 'تسوق التشكيلة الآن', newArrivals: 'New arrivals', storeProducts: 'منتجات المتجر', all: 'الكل', allProducts: 'كل المنتجات', product: 'منتج', chooseSize: 'اختر النمرة', chooseColor: 'اختر اللون', available: 'متوفر', unavailable: 'غير متوفر', added: 'تمت الإضافة', addToCart: 'إضافة للسلة', cart: 'سلة المشتريات', size: 'النمرة', color: 'اللون', total: 'المجموع', fullName: 'اسمك الكامل', phone: 'رقم الهاتف (واتساب)', location: 'العنوان / الموقع', confirmOrder: 'تأكيد الطلب', copyright: 'كل الحقوق محفوظة 2026 © ZALLOUM STORE', supportedBy: 'مدعوم ومصمم بواسطة' },
@@ -1380,44 +1380,49 @@
             event.target.setCustomValidity('');
             const password = event.target.value.trim();
             if (!password) return;
-            const response = await fetch('/api/admin/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json'                 },
-                async clearOrders() {
-                    if (!confirm('سيتم حذف جميع الطلبات وتصفير ترقيمها. هل تريد المتابعة؟')) return;
-                    try {
-                        const response = await fetch(`${this.apiUrl}/admin/orders`, { method: 'DELETE' });
-                        const data = await response.json().catch(() => ({}));
-                        if (!response.ok) {
-                            alert(data.error || 'تعذر تصفير الطلبات');
-                            return;
-                        }
-                        await this.loadAdminData();
-                        alert('تم تصفير الطلبات بنجاح');
-                    } catch (_) {
-                        alert('تعذر الاتصال بالخادم لتصفير الطلبات');
+            try {
+                const response = await fetch('https://zalloum-store.onrender.com/api/admin/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ password })
+                });
+                event.target.value = '';
+                if (response.ok) {
+                    document.querySelector('main').style.display = 'none';
+                    const dashboard = document.querySelector('[x-show="showDashboard"]');
+                    if (dashboard) dashboard.style.display = 'block';
+                    if (window.Alpine) {
+                        const app = window.Alpine.$data(document.body);
+                        app.showDashboard = true;
+                        app.cartOpen = false;
                     }
-                },
-                body: JSON.stringify({ password })
-            });
-            event.target.value = '';
-            if (response.ok) {
-                document.querySelector('main').style.display = 'none';
-                const dashboard = document.querySelector('[x-show="showDashboard"]');
-                if (dashboard) dashboard.style.display = 'block';
-                if (window.Alpine) {
-                    const app = window.Alpine.$data(document.body);
-                    app.showDashboard = true;
-                    app.cartOpen = false;
+                } else {
+                    event.target.setCustomValidity(
+                        response.status === 429
+                            ? 'تم إيقاف المحاولات مؤقتًا. انتظر قليلًا ثم حاول مرة أخرى.'
+                            : 'رمز المالك غير صحيح'
+                    );
+                    event.target.reportValidity();
                 }
+            } catch (err) {
+                event.target.setCustomValidity('تعذر الاتصال بالخادم');
+                event.target.reportValidity();
             }
-            else event.target.setCustomValidity(
-                response.status === 429
-                    ? 'تم إيقاف المحاولات مؤقتًا. انتظر قليلًا ثم حاول مرة أخرى.'
-                    : 'رمز المالك غير صحيح'
-            );
-            event.target.reportValidity();
         };
-    </script>
-</body>
-</html>
+
+        // دالة تصفير الطلبات الملحقة
+        storeApp.prototype.clearOrders = async function() {
+            if (!confirm('سيتم حذف جميع الطلبات وتصفير ترقيمها. هل تريد المتابعة؟')) return;
+            try {
+                const response = await fetch(`${this.apiUrl}/admin/orders`, { method: 'DELETE' });
+                const data = await response.json().catch(() => ({}));
+                if (!response.ok) {
+                    alert(data.error || 'تعذر تصفير الطلبات');
+                    return;
+                }
+                await this.loadAdminData();
+                alert('تم تصفير الطلبات بنجاح');
+            } catch (_) {
+                alert('تعذر الاتصال بالخادم لتصفير الطلبات');
+            }
+        };
