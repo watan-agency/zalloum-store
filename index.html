@@ -304,7 +304,7 @@
     <header :class="scrolled ? 'bg-[#121212] shadow-xl py-3' : 'bg-[#121212]/95 py-5'" class="sticky top-0 z-40 backdrop-blur-md border-b border-[#1A1A1A] transition-all duration-300 text-white">
         <div class="max-w-7xl mx-auto px-6 flex items-center justify-between gap-6">
             <a href="#" class="text-2xl font-black tracking-wider flex items-center gap-1 text-white order-1" aria-label="العودة إلى المتجر">
-                <img x-show="activeLogoImage()" :src="activeLogoImage()" alt="شعار المتجر" class="store-logo" :class="{ 'is-scrolled': scrolled }">
+                <img x-show="activeLogoImage()" :src="assetUrl(activeLogoImage())" alt="شعار المتجر" class="store-logo" :class="{ 'is-scrolled': scrolled }">
                 <span x-show="!activeLogoImage()" class="gold-accent font-extrabold">STORE</span><span x-show="!activeLogoImage()" class="font-extrabold">ZALLOUM</span>
             </a>
             <div class="flex-1 max-w-md relative order-2">
@@ -361,7 +361,7 @@
                     <div class="absolute w-72 h-72 bg-[#D4AF37]/10 rounded-full blur-3xl -top-10 -right-10 pointer-events-none"></div>
                     <div class="relative z-10 w-full max-w-md aspect-square rounded-3xl overflow-hidden shadow-2xl border border-gray-800 transform -rotate-3 hover:rotate-0 transition duration-500">
                         <template x-for="(image, index) in (heroImages.length ? heroImages : [defaultHeroImage])" :key="image + '-' + index">
-                            <img x-show="heroIndex === index" x-transition:enter="transition-opacity duration-700 ease-out" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition-opacity duration-700 ease-in" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" :src="image" alt="Hero Sneaker" class="absolute inset-0 w-full h-full object-cover">
+                            <img x-show="heroIndex === index" x-transition:enter="transition-opacity duration-700 ease-out" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100" x-transition:leave="transition-opacity duration-700 ease-in" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0" :src="assetUrl(image)" alt="Hero Sneaker" class="absolute inset-0 w-full h-full object-cover">
                         </template>
                     </div>
                 </div>
@@ -381,7 +381,7 @@
                 <div class="flex gap-5 items-center" :class="uniqueCarouselProducts().length > 1 ? 'animate-marquee' : 'justify-center w-full'" dir="ltr">
                     <template x-for="product in uniqueCarouselProducts()" :key="product.id">
                                 <a href="#products" class="w-52 h-36 sm:w-64 sm:h-44 bg-[#121212] rounded-2xl overflow-hidden border border-gray-800 flex-shrink-0 relative group shadow-md block">
-                                    <img :src="product.image" :alt="product.name" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-110 transition duration-500 opacity-80 group-hover:opacity-100">
+                                    <img :src="assetUrl(product.image)" :alt="product.name" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-110 transition duration-500 opacity-80 group-hover:opacity-100">
                                 </a>
                     </template>
                 </div>
@@ -408,7 +408,7 @@
                     <div @click="openProduct(product)" class="bg-white rounded-2xl overflow-hidden border border-gray-200 flex flex-col justify-between p-4 shadow-sm hover:shadow-md transition text-right cursor-pointer">
                                 <div>
                                     <div class="h-48 rounded-xl overflow-hidden bg-gray-100 mb-4">
-                                        <img :src="selectedVariant(product)?.image || product.image" :alt="product.name" loading="lazy" decoding="async" class="w-full h-full object-cover">
+                                        <img :src="assetUrl(selectedVariant(product)?.image || product.image)" :alt="product.name" loading="lazy" decoding="async" class="w-full h-full object-cover">
                                     </div>
                                     <h3 class="font-bold text-lg text-gray-900 mt-2 truncate" x-text="product.name"></h3>
                                     <p class="gold-accent font-black text-xl my-1 number" x-text="'₪ ' + toEnglishNumber(product.price)"></p>
@@ -454,7 +454,7 @@
         <div class="max-w-4xl mx-auto mt-8 bg-white rounded-3xl overflow-hidden shadow-2xl" @click.stop>
             <div class="flex justify-end p-3"><button @click="selectedProduct = null" class="text-gray-500 hover:text-black p-2 text-xl"><i class="fa-solid fa-xmark"></i></button></div>
             <div class="grid md:grid-cols-2 gap-6 p-6 pt-0 text-right">
-                <img :src="selectedVariant(selectedProduct)?.image || selectedProduct?.image" :alt="selectedProduct?.name" class="w-full aspect-square object-cover rounded-2xl bg-gray-100">
+                <img :src="assetUrl(selectedVariant(selectedProduct)?.image || selectedProduct?.image)" :alt="selectedProduct?.name" class="w-full aspect-square object-cover rounded-2xl bg-gray-100">
                 <div class="flex flex-col justify-center">
                     <span class="text-sm text-gray-500" x-text="selectedProduct?.category"></span>
                     <h2 class="text-3xl font-black mt-2" x-text="selectedProduct?.name"></h2>
@@ -490,7 +490,7 @@
                 <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
                     <template x-for="related in relatedProducts()" :key="related.id">
                         <button @click="openProduct(related)" class="text-right border rounded-xl overflow-hidden hover:border-[#D4AF37] transition">
-                            <img :src="related.image" :alt="related.name" loading="lazy" class="w-full aspect-square object-cover">
+                            <img :src="assetUrl(related.image)" :alt="related.name" loading="lazy" class="w-full aspect-square object-cover">
                             <span class="block p-2 text-sm font-bold truncate" x-text="related.name"></span>
                         </button>
                     </template>
@@ -517,19 +517,19 @@
                     <h3 class="text-lg font-bold text-[#121212]">شعار المتجر</h3>
                     <p class="text-sm text-gray-500 mt-1">ارفع شعارًا ليظهر بدل اسم المتجر في الترويسة.</p>
                 </div>
-                <button @click="saveLogoImages" :disabled="(!logoWhiteUpload && !logoDarkUpload) || isCompressing" class="gold-bg disabled:bg-gray-300 disabled:text-gray-500 text-black font-bold px-5 py-3 rounded-xl">حفظ الشعارين</button>
+                <button @click="saveLogoImages" :disabled="(!logoWصiteUpload && !logoDarkUpload) || isCompressing" class="gold-bg disabled:bg-gray-300 disabled:text-gray-500 text-black font-bold px-5 py-3 rounded-xl">حفظ الشعارين</button>
             </div>
             <div class="grid md:grid-cols-2 gap-5">
                 <div class="space-y-3">
                     <div class="rounded-2xl overflow-hidden bg-[#121212] aspect-video border border-gray-200 flex items-center justify-center p-4">
-                        <img :src="logoWhiteUpload || logoWhite || defaultWhiteLogoPreview" alt="معاينة الشعار الأبيض" class="max-w-full max-h-full object-contain">
+                        <img :src="assetUrl(logoWhiteUpload || logoWhite || defaultWhiteLogoPreview)" alt="معاينة الشعار الأبيض" class="max-w-full max-h-full object-contain">
                     </div>
                     <label class="block text-sm font-bold text-gray-700">الشعار الأبيض للوضع الداكن</label>
                     <input type="file" @change="compressLogoImage($event, 'white')" accept="image/png,image/jpeg,image/webp,image/gif" class="w-full bg-gray-50 border border-gray-200 p-2.5 rounded-xl">
                 </div>
                 <div class="space-y-3">
                     <div class="rounded-2xl overflow-hidden bg-white aspect-video border border-gray-200 flex items-center justify-center p-4">
-                        <img :src="logoDarkUpload || logoDark || defaultLogoPreview" alt="معاينة الشعار الأسود أو الملون" class="max-w-full max-h-full object-contain">
+                        <img :src="assetUrl(logoDarkUpload || logoDark || defaultLogoPreview)" alt="معاينة الشعار الأسود أو الملون" class="max-w-full max-h-full object-contain">
                     </div>
                     <label class="block text-sm font-bold text-gray-700">الشعار الأسود أو الملون للوضع الفاتح</label>
                     <input type="file" @change="compressLogoImage($event, 'dark')" accept="image/png,image/jpeg,image/webp,image/gif" class="w-full bg-gray-50 border border-gray-200 p-2.5 rounded-xl">
@@ -557,7 +557,7 @@
                 <template x-for="(upload, index) in heroUploads" :key="'hero-upload-' + index">
                     <div class="space-y-2">
                         <div class="rounded-2xl overflow-hidden bg-gray-100 aspect-video border border-gray-200">
-                            <img :src="upload || heroImages[index] || defaultHeroImage" :alt="'معاينة صورة الهيرو ' + (index + 1)" class="w-full h-full object-cover">
+                            <img :src="assetUrl(upload || heroImages[index] || defaultHeroImage)" :alt="'معاينة صورة الهيرو ' + (index + 1)" class="w-full h-full object-cover">
                         </div>
                         <label class="block text-sm font-bold text-gray-700" x-text="'الصورة ' + (index + 1)"></label>
                         <input type="file" @change="compressHeroImage($event, index)" accept="image/png,image/jpeg,image/webp,image/gif" class="w-full bg-gray-50 border border-gray-200 p-2.5 rounded-xl">
@@ -606,7 +606,7 @@
                 <template x-for="group in adminProductGroups()" :key="group.id">
                     <div class="border border-gray-200 rounded-xl p-3 space-y-2">
                         <div class="flex flex-wrap items-center gap-3">
-                            <img :src="group.image" class="w-12 h-12 object-cover rounded-lg">
+                            <img :src="assetUrl(group.image)" class="w-12 h-12 object-cover rounded-lg">
                             <span class="font-bold flex-1" x-text="'المنتج الرئيسي: ' + group.name"></span>
                             <span class="text-xs font-bold px-2 py-1 rounded-full bg-blue-100 text-blue-700" x-text="group.variants.length + ' فرع'"></span>
                             <button @click="startAddingVariant(group)" class="border border-[#D4AF37] text-[#8a6d12] px-3 py-2 rounded-lg text-sm font-bold">إضافة نمرة/لون</button>
@@ -616,7 +616,7 @@
                         <div class="mr-5 border-r-2 border-[#D4AF37] pr-3 space-y-2">
                             <template x-for="variant in group.variants" :key="variant.id">
                                 <div class="flex flex-wrap items-center gap-3 text-sm">
-                                    <img :src="variant.image" class="w-9 h-9 object-cover rounded-lg">
+                                    <img :src="assetUrl(variant.image)" class="w-9 h-9 object-cover rounded-lg">
                                     <span class="flex-1" x-text="(variant.size ? 'نمرة: ' + variant.size : 'بدون نمرة') + (variant.color ? ' - ' + variant.color : '')"></span>
                                     <span class="number" x-text="'الكمية: ' + variant.stock"></span>
                                     <button @click="startEditing(variant)" class="text-[#8a6d12] font-bold">تعديل الفرع</button>
@@ -642,7 +642,7 @@
                 <button type="submit" class="gold-bg text-black font-bold py-3 rounded-xl sm:col-span-2 lg:col-span-4">حفظ الفرع</button>
             </form>
         </div>
-        <div x-show="editingProduct?" class="lg:col-span-3 bg-white rounded-2xl p-6 border border-[#D4AF37] shadow-sm">
+        <div x-show="editingProduct && editingProduct.id" class="lg:col-span-3 bg-white rounded-2xl p-6 border border-[#D4AF37] shadow-sm">
             <div class="flex items-center justify-between mb-4">
                 <h3 class="text-lg font-bold"> تعديل المنتج</h3>
                 <button @click="editingProduct = null" class="text-gray-500 p-2"><i class="fa-solid fa-xmark"></i></button>
@@ -709,8 +709,11 @@
     <!-- الفوتر -->
     <footer class="bg-[#121212] text-gray-300 border-t border-gray-800 py-12 mt-20 text-center">
         <div class="max-w-7xl mx-auto px-6 flex flex-col items-center justify-center gap-6">
-            <p class="text-sm" data-i18n="copyright">كل الحقوق محفوظة 2026 &copy; ZALLOUM STORE</p>
-            <p class="text-sm font-bold tracking-wide text-gray-200"><span data-i18n="supportedBy">مدعوم ومصمم بواسطة</span> <span dir="ltr" class="en-font gold-accent">WATAN CREATIVE AGENCY</span></p>
+           <div style="text-align: center; margin-top: 10px;">
+  <p style="margin: 2px 0;">كل الحقوق محفوظة 2026 © ZALLOUM STORE</p>
+  <p style="margin: 2px 0;">مدعوم ومصمم بواسطة - WATAN CREATIVE AGENCY</p>
+  <p style="font-weight: light; margin: 2px 0;">ENG.MOHAMMAD.Y.SHABANEH</p>
+</div>
             <div class="flex items-center justify-center gap-4 text-xl">
                 <a href="https://www.tiktok.com/@zalloumsport?_r=1&_t=ZS-99of6Y3e8Hd" target="_blank" class="w-10 h-10 rounded-xl bg-[#1A1A1A] flex items-center justify-center text-gray-300 hover:bg-[#D4AF37] hover:text-black transition"><i class="fa-brands fa-tiktok"></i></a>
                 <a href="https://www.instagram.com/zalloum_sport?stkn=M3o2MXJsZ2M0anlj&utm_source=qr" target="_blank" class="w-10 h-10 rounded-xl bg-[#1A1A1A] flex items-center justify-center text-gray-300 hover:bg-[#D4AF37] hover:text-black transition"><i class="fa-brands fa-instagram"></i></a>
@@ -756,7 +759,67 @@
         });
  function storeApp() {
     return {
-        apiUrl: 'https://zalloum-store.onrender.com',
+        apiUrl: (() => {
+            const localApi = 'http://127.0.0.1:5001/api';
+            if (typeof window === 'undefined') return localApi;
+            const host = window.location.hostname;
+            const protocol = window.location.protocol;
+            if (
+                protocol === 'file:' ||
+                host === '' ||
+                host === 'localhost' ||
+                host === '127.0.0.1' ||
+                host === '0.0.0.0'
+            ) return localApi;
+            return `${window.location.origin}/api`;
+        })(),
+        language: localStorage.getItem('zalloum_language') || 'ar',
+        translations: {
+            ar: {
+                all: 'الكل',
+                allProducts: 'كل المنتجات',
+                addToCart: 'أضف إلى السلة',
+                added: 'أضيفت',
+                available: 'متوفر',
+                unavailable: 'غير متوفر',
+                size: 'المقاس',
+                color: 'اللون',
+                cart: 'سلة المشتريات',
+                total: 'المجموع',
+                fullName: 'الاسم الكامل',
+                phone: 'رقم الهاتف',
+                location: 'الموقع',
+                confirmOrder: 'تأكيد الطلب',
+                search: 'بحث',
+                chooseSize: 'اختر المقاس',
+                chooseColor: 'اختر اللون',
+                product: 'منتج',
+                supportedBy: 'مدعوم ومصمم بواسطة',
+                copyright: 'كل الحقوق محفوظة 2026 © ZALLOUM STORE'
+            },
+            he: {
+                all: 'הכל',
+                allProducts: 'כל המוצרים',
+                addToCart: 'הוסף לעגלה',
+                added: 'נוסף',
+                available: 'זמין',
+                unavailable: 'לא זמין',
+                size: 'מידה',
+                color: 'צבע',
+                cart: 'עגלת הקנייה',
+                total: 'סה"כ',
+                fullName: 'שם מלא',
+                phone: 'מספר טלפון',
+                location: 'מיקום',
+                confirmOrder: 'אישור הזמנה',
+                search: 'חיפוש',
+                chooseSize: 'בחר מידה',
+                chooseColor: 'בחר צבע',
+                product: 'מוצר',
+                supportedBy: 'נתמך ועוצב על ידי',
+                copyright: 'כל הזכויות שמורות 2026 © ZALLOUM STORE'
+            }
+        },
         searchQuery: '',
         showDashboard: false,
         adminLoginOpen: false,
@@ -770,7 +833,7 @@
         adminProducts: [],
         orders: [],
         cart: [],
-        editingProduct: null,
+        editingProduct: { name: '', category: '', price: '', size: '', color: '', stock: 0, image: '', description: '' },
         selectedProduct: null,
         variantParent: null,
         activeCategory: 'الكل',
@@ -815,12 +878,23 @@
         t(key) {
             return this.translations[this.language][key] || key;
         },
-        changeLanguage() {
+        assetUrl(value) {
+            if (!value || typeof value !== 'string') return value || '';
+            if (/^(data:|https?:|blob:)/i.test(value)) return value;
+            if (value.startsWith('/uploads/') || value.startsWith('/assets/')) {
+                return `${this.apiUrl.replace(/\/api\/?$/, '')}${value}`;
+            }
+            return value;
+        },
+        toggleLanguage() {
             this.language = this.language === 'ar' ? 'he' : 'ar';
             localStorage.setItem('zalloum_language', this.language);
             document.documentElement.lang = this.language;
             document.documentElement.dir = this.language === 'he' ? 'ltr' : 'rtl';
             this.applyTranslations();
+        },
+        changeLanguage() {
+            this.toggleLanguage();
         },
         applyTranslations() {
             document.querySelectorAll('[data-i18n]').forEach(element => {
@@ -839,9 +913,10 @@
                         if (!productsResponse.ok || !settingsResponse.ok) throw new Error('تعذر تحميل بيانات المتجر');
                         this.products = (await productsResponse.json()).map(product => {
                             const initial = product.variants?.find(v => v.stock > 0) || product.variants?.[0];
-                            product.selectedVariantId = initial?.id || product.id;
-                            product.selectedSize = initial?.size || '';
-                            product.selectedColor = initial?.color || '';
+                            const available = product.variants?.some(v => Number(v.stock) > 0);
+                            product.selectedVariantId = available ? initial?.id : null;
+                            product.selectedSize = available ? (initial?.size || '') : '';
+                            product.selectedColor = available ? (initial?.color || '') : '';
                             product.selectedQuantity = 1;
                             return product;
                         });
@@ -1035,7 +1110,7 @@
                     this.loginError = '';
                     let response;
                     try {
-                        response = await fetch(`${this.apiUrl}/admin/login`, { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({password: this.loginPassword}) });
+                        response = await fetch(`${this.apiUrl}/admin/login`, { method: 'POST', credentials: 'include', headers: {'Content-Type':'application/json'}, body: JSON.stringify({password: this.loginPassword}) });
                     } catch (_) {
                         this.loginError = 'الخادم غير متصل. افتح المتجر من http://127.0.0.1:5173 وليس Live Server.';
                         return;
@@ -1050,12 +1125,20 @@
                     await this.loadAdminData();
                 },
                 async loadAdminData() {
+                    const requestOptions = { credentials: 'include' };
                     const [ordersResponse, productsResponse] = await Promise.all([
-                        fetch(`${this.apiUrl}/admin/orders`),
-                        fetch(`${this.apiUrl}/admin/products`)
+                        fetch(`${this.apiUrl}/admin/orders`, requestOptions),
+                        fetch(`${this.apiUrl}/admin/products`, requestOptions)
                     ]);
-                    if (ordersResponse.ok) this.orders = await ordersResponse.json();
-                    if (productsResponse.ok) this.adminProducts = await productsResponse.json();
+                    if (!ordersResponse.ok || !productsResponse.ok) {
+                        if (ordersResponse.status === 401 || productsResponse.status === 401) {
+                            this.showDashboard = false;
+                            this.loginError = 'انتهت جلسة الدخول. سجّل الدخول مرة أخرى.';
+                        }
+                        return;
+                    }
+                    this.orders = await ordersResponse.json();
+                    this.adminProducts = await productsResponse.json();
                 },
 
                 compressImage(event) {
@@ -1158,6 +1241,7 @@
                     if (!this.logoWhiteUpload && !this.logoDarkUpload) return;
                     const response = await fetch(`${this.apiUrl}/admin/store-settings/logo`, {
                         method: 'PUT',
+                        credentials: 'include',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
                             whiteImage: this.logoWhiteUpload || undefined,
@@ -1180,6 +1264,7 @@
                     const number = this.toEnglishNumber(this.whatsappNumber).replace(/\D/g, '');
                     const response = await fetch(`${this.apiUrl}/admin/store-settings/whatsapp`, {
                         method: 'PUT',
+                        credentials: 'include',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ number })
                     });
@@ -1197,6 +1282,7 @@
                     if (!images.length) return;
                     const response = await fetch(`${this.apiUrl}/admin/store-settings/hero`, {
                         method: 'PUT',
+                        credentials: 'include',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({ images })
                     });
@@ -1214,6 +1300,7 @@
                     try {
                         const response = await fetch(`${this.apiUrl}/admin/store-settings/homepage`, {
                             method: 'PUT',
+                            credentials: 'include',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ content: this.homepageText })
                         });
@@ -1283,6 +1370,7 @@
                     }
                     const response = await fetch(`${this.apiUrl}/admin/products/${this.variantParent.id}/variants`, {
                         method: 'POST',
+                        credentials: 'include',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(this.newVariant)
                     });
@@ -1310,7 +1398,6 @@
                         if (!response.ok) throw new Error(data.error || 'تعذر تأكيد الطلب');
                         if (data.whatsappUrl) {
                             if (whatsappWindow) {
-                                whatsappWindow.opener = null;
                                 whatsappWindow.location.href = data.whatsappUrl;
                             } else {
                                 window.open(data.whatsappUrl, '_blank', 'noopener,noreferrer');
@@ -1337,7 +1424,7 @@
 
                     try {
                         const response = await fetch(`${this.apiUrl}/admin/products`, {
-                            method: 'POST', headers: { 'Content-Type': 'application/json' },
+                            method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify(this.newProduct)
                         });
 
@@ -1364,6 +1451,7 @@
                     }
                     const response = await fetch(`${this.apiUrl}/admin/products/${this.editingProduct.id}`, {
                         method: 'PUT',
+                        credentials: 'include',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify(this.editingProduct)
                     });
@@ -1378,21 +1466,21 @@
                     alert('تم حفظ تعديلات المنتج');
                 },
                 async updateStock(product, stock) {
-                    const response = await fetch(`${this.apiUrl}/admin/products/${product.id}/stock`, { method:'PATCH', headers:{'Content-Type':'application/json'}, body:JSON.stringify({stock:Number(stock)}) });
+                    const response = await fetch(`${this.apiUrl}/admin/products/${product.id}/stock`, { method:'PATCH', credentials:'include', headers:{'Content-Type':'application/json'}, body:JSON.stringify({stock:Number(stock)}) });
                     if (response.ok) product.stock = Number(stock); else alert('تعذر تعديل المخزون');
                 },
                 async deleteProduct(product) {
                     if (!confirm('حذف هذا المنتج؟')) return;
-                    const response = await fetch(`${this.apiUrl}/admin/products/${product.id}`, {method:'DELETE'});
+                    const response = await fetch(`${this.apiUrl}/admin/products/${product.id}`, {method:'DELETE', credentials:'include'});
                     if (response.ok) this.adminProducts = this.adminProducts.filter(item => item.id !== product.id); else alert('تعذر حذف المنتج');
                 },
                 async updateOrderStatus(order, status) {
-                    const response = await fetch(`${this.apiUrl}/admin/orders/${order.id}`, {method:'PATCH', headers:{'Content-Type':'application/json'}, body:JSON.stringify({status})});
+                    const response = await fetch(`${this.apiUrl}/admin/orders/${order.id}`, {method:'PATCH', credentials:'include', headers:{'Content-Type':'application/json'}, body:JSON.stringify({status})});
                     if (response.ok) order.status = status; else alert('تعذر تحديث حالة الطلب');
                 },
                 async deleteOrder(order) {
                     if (!confirm(`حذف الطلب #${order.id} نهائيًا؟`)) return;
-                    const response = await fetch(`${this.apiUrl}/admin/orders/${order.id}`, { method: 'DELETE' });
+                    const response = await fetch(`${this.apiUrl}/admin/orders/${order.id}`, { method: 'DELETE', credentials:'include' });
                     const data = await response.json();
                     if (!response.ok) {
                         alert(data.error || 'تعذر حذف الطلب');
@@ -1408,8 +1496,9 @@
             const password = event.target.value.trim();
             if (!password) return;
             try {
-                const response = await fetch('https://zalloum-store.onrender.com/api/admin/login', {
+                const response = await fetch(`${this.apiUrl}/admin/login`, {
                     method: 'POST',
+                    credentials: 'include',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ password })
                 });
@@ -1441,7 +1530,7 @@
         storeApp.prototype.clearOrders = async function() {
             if (!confirm('سيتم حذف جميع الطلبات وتصفير ترقيمها. هل تريد المتابعة؟')) return;
             try {
-                const response = await fetch(`${this.apiUrl}/admin/orders`, { method: 'DELETE' });
+                const response = await fetch(`${this.apiUrl}/admin/orders`, { method: 'DELETE', credentials: 'include' });
                 const data = await response.json().catch(() => ({}));
                 if (!response.ok) {
                     alert(data.error || 'تعذر تصفير الطلبات');
@@ -1453,3 +1542,6 @@
                 alert('تعذر الاتصال بالخادم لتصفير الطلبات');
             }
         };
+    </script>
+</body>
+</html>

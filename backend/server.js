@@ -1,18 +1,31 @@
 'use strict';
 
 const Database = require('better-sqlite3');
-const db = new Database('store.db');
 
 const express = require('express');
 const path = require('path');
 const crypto = require('crypto');
 const fs = require('fs');
+const compression = require('compression');
 const app = express();
-const PORT = Number(process.env.PORT) || 5000;
-const DB_PATH = path.join(__dirname, 'store.db');
-const UPLOADS_DIR = path.join(__dirname, 'uploads');
-const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
-const COOKIE_SECURE = process.env.COOKIE_SECURE !== 'false';
+const PORT = Number(process.env.PORT) || 5001;
+const DATA_DIR = process.env.DATA_DIR || __dirname;
+const DB_PATH = path.join(DATA_DIR, 'store.db');
+fs.mkdirSync(DATA_DIR, { recursive: true });
+const UPLOADS_DIR = path.join(DATA_DIR, 'uploads');
+const DEV_ORIGINS = new Set([
+  'http://127.0.0.1:5173',
+  'http://localhost:5173',
+  'http://127.0.0.1:5500',
+  'http://localhost:5500',
+  'http://127.0.0.1:5501',
+  'http://localhost:5501',
+  `http://127.0.0.1:${PORT}`,
+  `http://localhost:${PORT}`,
+  'https://zalloum-store.onrender.com'
+]);
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'zalloum2003';
+const COOKIE_SECURE = process.env.COOKIE_SECURE === 'true';
 const WHATSAPP_ACCESS_TOKEN = process.env.WHATSAPP_ACCESS_TOKEN;
 const WHATSAPP_PHONE_NUMBER_ID = process.env.WHATSAPP_PHONE_NUMBER_ID;
 const WHATSAPP_RECIPIENT_NUMBER = process.env.WHATSAPP_RECIPIENT_NUMBER;
@@ -21,7 +34,16 @@ const MAX_IMAGE_LENGTH = 5 * 1024 * 1024;
 const sessions = new Map();
 const rateLimits = new Map();
 
+if (DATA_DIR !== __dirname) {
+  if (!fs.existsSync(DB_PATH) && fs.existsSync(path.join(__dirname, 'store.db'))) {
+    fs.copyFileSync(path.join(__dirname, 'store.db'), DB_PATH);
+  }
+  if (!fs.existsSync(UPLOADS_DIR) && fs.existsSync(path.join(__dirname, 'uploads'))) {
+    fs.cpSync(path.join(__dirname, 'uploads'), UPLOADS_DIR, { recursive: true });
+  }
+}
 fs.mkdirSync(UPLOADS_DIR, { recursive: true });
+const db = new Database(DB_PATH);
 
 if (!ADMIN_PASSWORD) throw new Error('ADMIN_PASSWORD must be configured before starting the server');
 if (!WHATSAPP_ACCESS_TOKEN || !WHATSAPP_PHONE_NUMBER_ID || !WHATSAPP_RECIPIENT_NUMBER) {
@@ -41,6 +63,12 @@ db.prepare(`
     size TEXT NOT NULL DEFAULT '',
     color TEXT NOT NULL DEFAULT '',
     parent_id INTEGER
+  )
+`).run();
+db.prepare(`
+  CREATE TABLE IF NOT EXISTS store_settings (
+    key TEXT PRIMARY KEY,
+    value TEXT NOT NULL DEFAULT ''
   )
 `).run();
 db.prepare(`
@@ -67,37 +95,40 @@ db.prepare(`
     FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE
   )
 `).run();
+const productColumns = new Set(db.prepare('PRAGMA table_info(products)').all().map(column => column.name));
+if (!productColumns.has('description')) {
+  db.prepare("ALTER TABLE products ADD COLUMN description TEXT NOT NULL DEFAULT ''").run();
+}
 
 app.disable('x-powered-by');
-app.disable('x-powered-by');
+app.use(compression());
+app.get('/healthz', (req, res) => res.json({ ok: true }));
 app.use((req, res, next) => {
   res.set({
     'X-Content-Type-Options': 'nosniff', 
     'X-Frame-Options': 'DENY',
     'Referrer-Policy': 'no-referrer', 
     'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
-    'Content-Security-Policy': "default-src 'self'; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; style-src 'self' 'unsafe-inline' https:; font-src 'self' https: data:; frame-ancestors 'none'"
+    'Content-Security-Policy': "default-src 'self'; connect-src 'self' http://127.0.0.1:5001 http://localhost:5001 https:; img-src 'self' http://127.0.0.1:5001 http://localhost:5001 data: https:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; style-src 'self' 'unsafe-inline' https:; font-src 'self' https: data:; frame-ancestors 'none'"
   });
   const origin = req.get('origin');
-  if (origin && origin !== `${req.protocol}://${req.get('host')}`) return res.status(403).json({ error: 'Origin not allowed' });
+  const host = req.get('host');
+  const isSameOrigin = !!origin && origin === `${req.protocol}://${host}`;
+  const allowed = origin === 'null' || (origin ? DEV_ORIGINS.has(origin) : false);
+  if (origin && !isSameOrigin && !allowed) return res.status(403).json({ error: 'Origin not allowed' });
+  if (origin && (isSameOrigin || allowed)) {
+    res.set({
+      'Access-Control-Allow-Origin': origin,
+      'Access-Control-Allow-Credentials': 'true',
+      'Access-Control-Allow-Methods': 'GET,POST,PUT,PATCH,DELETE,OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type'
+    });
+  }
+  if (req.method === 'OPTIONS') return res.sendStatus(204);
   next();
 });
 
 app.use(express.json({ limit: '8mb', strict: true }));
-
-function query(sql, params = []) {
-  const stmt = db.prepare(sql);
-  return stmt.all(params);
-}
-
-function run(sql, params = []) {
-  const stmt = db.prepare(sql);
-  const info = stmt.run(params);
-  return {
-    lastID: info.lastInsertRowid,
-    changes: info.changes
-  };
-}
 
 function limited(key, max, windowMs) {
   const now = Date.now();
@@ -108,10 +139,13 @@ function limited(key, max, windowMs) {
 }
 function clientKey(req) { return req.ip || req.socket.remoteAddress || 'unknown'; }
 function query(sql, params = []) {
-  return new Promise((resolve, reject) => db.all(sql, params, (err, rows) => err ? reject(err) : resolve(rows)));
+  const stmt = db.prepare(sql);
+  return Promise.resolve(stmt.all(...(Array.isArray(params) ? params : [params])));
 }
 function run(sql, params = []) {
-  return new Promise((resolve, reject) => db.run(sql, params, function (err) { err ? reject(err) : resolve(this); }));
+  const stmt = db.prepare(sql);
+  const info = stmt.run(...(Array.isArray(params) ? params : [params]));
+  return Promise.resolve({ lastID: info.lastInsertRowid, changes: info.changes });
 }
 function cookieToken(req) {
   const match = (req.get('cookie') || '').match(/(?:^|;\s*)admin_session=([^;]+)/);
@@ -551,8 +585,8 @@ app.post('/api/checkout', async (req, res) => {
   }
 });
 
-app.use('/uploads', express.static(UPLOADS_DIR, { index: false, fallthrough: false }));
-app.use('/assets', express.static(path.join(__dirname, '..', 'assets'), { index: false, fallthrough: false }));
+app.use('/uploads', express.static(UPLOADS_DIR, { index: false, fallthrough: false, maxAge: '7d', immutable: true }));
+app.use('/assets', express.static(path.join(__dirname, '..', 'assets'), { index: false, fallthrough: false, maxAge: '7d', immutable: true }));
 app.get(/.*/, (req, res) => res.sendFile(path.join(__dirname, '..', 'index.html')));
 
 if (require.main === module) app.listen(PORT, () => console.log(`Server listening on port ${PORT}`));

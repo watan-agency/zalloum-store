@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "ADMIN_PASSWORD='zalloum 2003' node server.js",
-    "dev": "ADMIN_PASSWORD='zalloum 2003' node server.js",
+    "start": "node server.js",
+    "dev": "node server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -13,9 +13,8 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
-    "body-parser": "^2.3.0",
-    "cors": "^2.8.6",
-    "express": "^5.2.1",
-    "sqlite3": "^6.0.1"
+    "better-sqlite3": "^13.0.3",
+    "compression": "^1.8.1",
+    "express": "^5.2.1"
   }
 }
