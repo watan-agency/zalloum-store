@@ -69,17 +69,35 @@ db.prepare(`
 `).run();
 
 app.disable('x-powered-by');
+app.disable('x-powered-by');
 app.use((req, res, next) => {
   res.set({
-    'X-Content-Type-Options': 'nosniff', 'X-Frame-Options': 'DENY',
-    'Referrer-Policy': 'no-referrer', 'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
+    'X-Content-Type-Options': 'nosniff', 
+    'X-Frame-Options': 'DENY',
+    'Referrer-Policy': 'no-referrer', 
+    'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
     'Content-Security-Policy': "default-src 'self'; img-src 'self' data: https:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https:; style-src 'self' 'unsafe-inline' https:; font-src 'self' https: data:; frame-ancestors 'none'"
   });
   const origin = req.get('origin');
   if (origin && origin !== `${req.protocol}://${req.get('host')}`) return res.status(403).json({ error: 'Origin not allowed' });
   next();
 });
+
 app.use(express.json({ limit: '8mb', strict: true }));
+
+function query(sql, params = []) {
+  const stmt = db.prepare(sql);
+  return stmt.all(params);
+}
+
+function run(sql, params = []) {
+  const stmt = db.prepare(sql);
+  const info = stmt.run(params);
+  return {
+    lastID: info.lastInsertRowid,
+    changes: info.changes
+  };
+}
 
 function limited(key, max, windowMs) {
   const now = Date.now();
