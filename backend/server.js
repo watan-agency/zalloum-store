@@ -1,5 +1,8 @@
 'use strict';
 
+const Database = require('better-sqlite3');
+const db = new Database('store.db');
+
 const express = require('express');
 const path = require('path');
 const crypto = require('crypto');
@@ -23,11 +26,19 @@ fs.mkdirSync(UPLOADS_DIR, { recursive: true });
 if (!ADMIN_PASSWORD) throw new Error('ADMIN_PASSWORD must be configured before starting the server');
 if (!WHATSAPP_ACCESS_TOKEN || !WHATSAPP_PHONE_NUMBER_ID || !WHATSAPP_RECIPIENT_NUMBER) {
   console.warn('WhatsApp Cloud API is not configured; orders will be saved but no message will be sent.');
-}
-
-const db = new Database('store.db');
-
-// إنشاء الجدول مباشرة
+}// إنشاء الجداول
+db.prepare(`
+  CREATE TABLE IF NOT EXISTS products (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT,
+    price REAL,
+    image TEXT,
+    category TEXT,
+    sizes TEXT,
+    colors TEXT,
+    stock INTEGER
+  )
+`).run();
 db.serialize(() => {
   db.prepare(`
     CREATE TABLE IF NOT EXISTS products (
