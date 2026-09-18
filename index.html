@@ -754,51 +754,80 @@
                 characterData: true
             });
         });
-
-        function storeApp() {
+ function storeApp() {
     return {
         apiUrl: 'https://zalloum-store.onrender.com',
         searchQuery: '',
         showDashboard: false,
         adminLoginOpen: false,
-                loginPassword: '', loginError: '', cartOpen: false, scrolled: false, isCompressing: false,
-                lightTheme: localStorage.getItem('zalloum_light_theme') === 'true',
-                products: [], adminProducts: [], orders: [], cart: [], editingProduct: null, selectedProduct: null, variantParent: null, activeCategory: 'الكل',
-                storeError: '',
-                defaultHeroImage: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&q=80&w=600',
-                heroImages: [], heroUploads: ['', '', ''], heroIndex: 0,
-                defaultLogoPreview: 'https://dummyimage.com/320x100/ffffff/121212.png&text=ZALLOUM+STORE',
-                defaultWhiteLogoPreview: 'https://dummyimage.com/320x100/121212/ffffff.png&text=ZALLOUM+STORE',
-                logoWhite: '', logoDark: '', logoWhiteUpload: '', logoDarkUpload: '',
-                whatsappNumber: '',
-                homepageText: {
-                    ar: { season: 'تشكية زلوم ستور', heroTitle: 'خطوتك التالية نحو', styleComfort: 'الأناقة والراحة', heroDescription: 'اكتشف تصاميم الأحذية العصرية المصممة خصيصاً لتمنحك الراحة الفائقة والمظهر الاستثنائي في كل وقت.', shopNow: 'تسوق التشكيلة الآن', storeProducts: 'منتجات المتجر' },
-                    he: { season: 'קולקציית זלום סטור', heroTitle: 'הצעד הבא שלך אל', styleComfort: 'סטייל ונוחות', heroDescription: 'גלו עיצובי נעליים אופנתיים שנועדו להעניק לכם נוחות ומראה יוצא דופן בכל עת.', shopNow: 'קנו את הקולקציה עכשיו', storeProducts: 'מוצרי החנות' }
-                },
-                customer: { name: '', phone: '', location: '' },
-                newProduct: { name: '', category: '', price: '', size: '', color: '', stock: 0, image: '', description: '' },
-                newVariant: { size: '', color: '', stock: 0, image: '' },
+        loginPassword: '',
+        loginError: '',
+        cartOpen: false,
+        scrolled: false,
+        isCompressing: false,
+        lightTheme: localStorage.getItem('zalloum_light_theme') === 'true',
+        products: [],
+        adminProducts: [],
+        orders: [],
+        cart: [],
+        editingProduct: null,
+        selectedProduct: null,
+        variantParent: null,
+        activeCategory: 'الكل',
+        storeError: '',
+        defaultHeroImage: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&q=80&w=600',
+        heroImages: [],
+        heroUploads: ['', '', ''],
+        heroIndex: 0,
+        defaultLogoPreview: 'https://dummyimage.com/320x100/ffffff/121212.png&text=ZALLOUM+STORE',
+        defaultWhiteLogoPreview: 'https://dummyimage.com/320x100/121212/ffffff.png&text=ZALLOUM+STORE',
+        logoWhite: '',
+        logoDark: '',
+        logoWhiteUpload: '',
+        logoDarkUpload: '',
+        whatsappNumber: '',
+        homepageText: {
+            ar: {
+                season: 'تشكيلة زلوم ستور',
+                heroTitle: 'خطوتك التالية نحو',
+                styleComfort: 'الأناقة والراحة',
+                heroDescription: 'اكتشف تصاميم الأحذية العصرية المصممة خصيصاً لتمنحك الراحة الفائقة والمظهر الاستثنائي في كل وقت.',
+                shopNow: 'تسوق التشكيلة الآن',
+                storeProducts: 'منتجات المتجر'
+            },
+            he: {
+                season: 'קולקציית זלום סטור',
+                heroTitle: 'הצעד הבא שלך אל',
+                styleComfort: 'סטייל ונוחות',
+                heroDescription: 'גלו עיצובי נעליים אופנתיים שנועדו להעניק לכם נוחות ומראה יוצא דופן בכל עת.',
+                shopNow: 'קנו את הקולקציה עכשיו',
+                storeProducts: 'מוצרי החנות'
+            }
+        },
+        customer: { name: '', phone: '', location: '' },
+        newProduct: { name: '', category: '', price: '', size: '', color: '', stock: 0, image: '', description: '' },
+        newVariant: { size: '', color: '', stock: 0, image: '' },
 
-                toggleTheme() {
-                    this.lightTheme = !this.lightTheme;
-                    localStorage.setItem('zalloum_light_theme', String(this.lightTheme));
-                },
-                t(key) {
-                    return this.translations[this.language][key] || key;
-                },
-                toggleLanguage() {
-                    this.language = this.language === 'ar' ? 'he' : 'ar';
-                    localStorage.setItem('zalloum_language', this.language);
-                    document.documentElement.lang = this.language;
-                    document.documentElement.dir = this.language === 'he' ? 'ltr' : 'rtl';
-                    this.applyTranslations();
-                },
-                applyTranslations() {
-                    document.querySelectorAll('[data-i18n]').forEach(element => {
-                        const key = element.dataset.i18n;
-                        if (this.translations[this.language][key]) element.textContent = this.t(key);
-                    });
-                },
+        toggleTheme() {
+            this.lightTheme = !this.lightTheme;
+            localStorage.setItem('zalloum_light_theme', String(this.lightTheme));
+        },
+        t(key) {
+            return this.translations[this.language][key] || key;
+        },
+        changeLanguage() {
+            this.language = this.language === 'ar' ? 'he' : 'ar';
+            localStorage.setItem('zalloum_language', this.language);
+            document.documentElement.lang = this.language;
+            document.documentElement.dir = this.language === 'he' ? 'ltr' : 'rtl';
+            this.applyTranslations();
+        },
+        applyTranslations() {
+            document.querySelectorAll('[data-i18n]').forEach(element => {
+                const key = element.dataset.i18n;
+                if (this.translations[this.language][key]) element.textContent = this.t(key);
+            });
+        },
 
                 async init() {
                     this.applyTranslations();
