@@ -756,13 +756,11 @@
         });
 
         function storeApp() {
-            return {
-                apiUrl: 'https://zalloum-store.onrender.com', searchQuery: '', showDashboard: false, adminLoginOpen: false,
-                language: localStorage.getItem('zalloum_language') === 'he' ? 'he' : 'ar',
-                translations: {
-                    ar: { search: 'ابحث في المتجر', season: 'تشكيلة صيف 2026 الجديدة', heroTitle: 'خطوتك التالية نحو', styleComfort: 'الأناقة والراحة', heroDescription: 'اكتشف تصاميم الأحذية العصرية المصممة خصيصاً لتمنحك الأداء الرياضي الفائق والمظهر الاستثنائي في كل وقت.', shopNow: 'تسوق التشكيلة الآن', newArrivals: 'New arrivals', storeProducts: 'منتجات المتجر', all: 'الكل', allProducts: 'كل المنتجات', product: 'منتج', chooseSize: 'اختر النمرة', chooseColor: 'اختر اللون', available: 'متوفر', unavailable: 'غير متوفر', added: 'تمت الإضافة', addToCart: 'إضافة للسلة', cart: 'سلة المشتريات', size: 'النمرة', color: 'اللون', total: 'المجموع', fullName: 'اسمك الكامل', phone: 'رقم الهاتف (واتساب)', location: 'العنوان / الموقع', confirmOrder: 'تأكيد الطلب', copyright: 'كل الحقوق محفوظة 2026 © ZALLOUM STORE', supportedBy: 'مدعوم ومصمم بواسطة' },
-                    he: { search: 'חפש בחנות', season: 'קולקציית קיץ 2026 החדשה', heroTitle: 'הצעד הבא שלך אל', styleComfort: 'סטייל ונוחות', heroDescription: 'גלו עיצובי נעליים אופנתיים שנועדו להעניק לכם ביצועים ספורטיביים מעולים ומראה יוצא דופן בכל עת.', shopNow: 'קנו את הקולקציה עכשיו', newArrivals: 'New arrivals', storeProducts: 'מוצרי החנות', all: 'הכל', allProducts: 'כל המוצרים', product: 'מוצרים', chooseSize: 'בחרו מידה', chooseColor: 'בחרו צבע', available: 'במלאי', unavailable: 'לא במלאי', added: 'נוסף בהצלחה', addToCart: 'הוסף לסל', cart: 'סל הקניות', size: 'מידה', color: 'צבע', total: 'סה״כ', fullName: 'שם מלא', phone: 'מספר טלפון (וואטסאפ)', location: 'כתובת / מיקום', confirmOrder: 'אישור הזמנה', copyright: 'כל הזכויות שמורות 2026 © ZALLOUM STORE', supportedBy: 'נתמך ועוצב על ידי' }
-                },
+    return {
+        apiUrl: 'https://zalloum-store.onrender.com',
+        searchQuery: '',
+        showDashboard: false,
+        adminLoginOpen: false,
                 loginPassword: '', loginError: '', cartOpen: false, scrolled: false, isCompressing: false,
                 lightTheme: localStorage.getItem('zalloum_light_theme') === 'true',
                 products: [], adminProducts: [], orders: [], cart: [], editingProduct: null, selectedProduct: null, variantParent: null, activeCategory: 'الكل',
